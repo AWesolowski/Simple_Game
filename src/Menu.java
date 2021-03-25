@@ -27,7 +27,7 @@ public class Menu extends JPanel
     private final JButton highscores_button;
     private final JButton options_button;
     private final JButton exit_button;
-    private final JLabel menuStart;
+    private final JLabel panel_name;
 
     private Image background_image;
     private Image start_button_image;
@@ -69,10 +69,10 @@ public class Menu extends JPanel
         this.add(exit_button);
         setComponentZOrder(exit_button, 0);
 
-        menuStart = new JLabel("Menu Start", SwingConstants.CENTER);
-        menuStart.setForeground(Color.LIGHT_GRAY);
-        this.add(menuStart);
-        setComponentZOrder(menuStart, 0);
+        panel_name = new JLabel("Menu Start", SwingConstants.CENTER);
+        panel_name.setForeground(Color.LIGHT_GRAY);
+        this.add(panel_name);
+        setComponentZOrder(panel_name, 0);
     }
 
 
@@ -118,9 +118,9 @@ public class Menu extends JPanel
         exit_button.setLocation((x - button_width)/2, (int) (y * 0.8));
 
         font_size = Math.min((int) (height * 0.069686), (int) (width * 0.045));
-        menuStart.setSize((int) (width * 0.2125),(int) (height * 0.08711));
-        menuStart.setLocation((width - ((int) (width * 0.2125)))/2, (int) (height * 0.0348));
-        menuStart.setFont(new Font("Serif", Font.PLAIN, font_size));
+        panel_name.setSize((int) (width * 0.2125),(int) (height * 0.08711));
+        panel_name.setLocation((width - ((int) (width * 0.2125)))/2, (int) (height * 0.0348));
+        panel_name.setFont(new Font("Serif", Font.PLAIN, font_size));
     }
 
 

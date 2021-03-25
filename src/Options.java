@@ -29,7 +29,7 @@ public class Options extends JPanel
     private final JButton volume_up_button;
     private final JButton volume_down_button;
     private final JButton mute_button;
-    private final JLabel nickname;
+    private final JLabel panel_name;
     private final Image background_image;
     private Image return_button_image;
     private Image volume_up_button_image;
@@ -70,10 +70,10 @@ public class Options extends JPanel
         this.add(mute_button);
         setComponentZOrder(mute_button, 0);
 
-        nickname = new JLabel("Options", SwingConstants.CENTER);
-        nickname.setForeground(Color.LIGHT_GRAY);
-        this.add(nickname);
-        setComponentZOrder(nickname, 0);
+        panel_name = new JLabel("Options", SwingConstants.CENTER);
+        panel_name.setForeground(Color.LIGHT_GRAY);
+        this.add(panel_name);
+        setComponentZOrder(panel_name, 0);
     }
 
 
@@ -143,9 +143,9 @@ public class Options extends JPanel
         mute_button.setLocation((x - button_width)/2, (int) (y * 0.2));
 
         font_size = Math.min((int) (height * 0.069686), (int) (width * 0.045));
-        nickname.setFont(new Font("Serif", Font.PLAIN, font_size));
-        nickname.setSize((int) (width * 0.2125),(int) (height * 0.08711));
-        nickname.setLocation((width - ((int) (width * 0.2125)))/2, (int) (height * 0.0348));
+        panel_name.setFont(new Font("Serif", Font.PLAIN, font_size));
+        panel_name.setSize((int) (width * 0.2125),(int) (height * 0.08711));
+        panel_name.setLocation((width - ((int) (width * 0.2125)))/2, (int) (height * 0.0348));
     }
 
 

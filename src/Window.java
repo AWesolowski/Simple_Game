@@ -16,14 +16,16 @@ public class Window extends JFrame
     private boolean file_exist = true;
     private boolean shorten = false;
 
-    private String o_nick;
+    private String players_nick;
     private int lines_numb;
 
     private String title = "Shoot the ravens";
 
     private Menu menu;
+    private Nick nick;
     private Highscores highscores;
     private Options options;
+    private Difficulty difficulty;
     private Music music;
 
     private Window()
@@ -42,8 +44,10 @@ public class Window extends JFrame
         CustomCursor();
 
         menu = new Menu(window_width, window_height);
+        nick = new Nick(window_width, window_height);
         highscores = new Highscores(window_width, window_height);
         options = new Options(window_width, window_height);
+        difficulty = new Difficulty(window_width, window_height);
         music = new Music();
         music.CustomSoundBackground(filepath_sounds + "background_music.wav");
 
@@ -80,7 +84,7 @@ public class Window extends JFrame
         if (state == 1)
         {
             menu.setState(0);
-            //call_nick;
+            call_nick();
         }
         else if (state == 2)
         {
@@ -96,10 +100,41 @@ public class Window extends JFrame
     }
 
 
+    private void call_nick()
+    {
+        nick.setSize(window_width, window_height);
+        this.add(nick);
+        repaint();
+
+        while (true)
+        {
+            try {Thread.sleep(100);}
+            catch (InterruptedException e){}
+            if (nick.getState() != 0)
+            {
+                getContentPane().removeAll();
+                break;
+            }
+        }
+
+        if (nick.getState() == 1)
+        {
+            players_nick = nick.getPlayers_nick();
+            nick.setState(0);
+            call_difficulty();
+        }
+        else if (nick.getState() == -1)
+        {
+            nick.setState(0);
+            call_menu();
+        }
+    }
+
+
     private void call_highscores()
     {
         highscores.setSize(window_width, window_height);
-        add(highscores);
+        this.add(highscores);
         repaint();
 
         while (true)
@@ -193,6 +228,51 @@ public class Window extends JFrame
             options.setState(0);
             call_menu();
         }
+    }
+
+
+    private void call_difficulty()
+    {
+        difficulty.setSize(window_width, window_height);
+        this.add(difficulty);
+        repaint();
+
+        while (true)
+        {
+            try {Thread.sleep(100);}
+            catch (InterruptedException e){}
+            if (difficulty.getState() != 0)
+            {
+                getContentPane().removeAll();
+                break;
+            }
+        }
+
+        if (difficulty.getState() == 1)
+        {
+
+        }
+        else if (difficulty.getState() == 2)
+        {
+
+        }
+        else if (difficulty.getState() == 3)
+        {
+
+        }
+        else if (difficulty.getState() == 4)
+        {
+
+        }
+        else if (difficulty.getState() == 5)
+        {
+
+        }else if (difficulty.getState() == -1)
+        {
+            difficulty.setState(0);
+            call_nick();
+        }
+
     }
 
 

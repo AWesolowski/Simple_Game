@@ -1,0 +1,16 @@
+
+
+Nick :
+
+Make -Enter default for -OK button
+
+Get rid of white rectangle for nickname typing
+IDEA :Make JText ZOrder !=0 and add unclickable JLabel at it's place to display written nick
+
+
+
+
+
+SOUND :
+make button sounds quieter
+

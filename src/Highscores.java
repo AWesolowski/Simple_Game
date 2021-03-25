@@ -31,7 +31,7 @@ public class Highscores extends JPanel
     private int number_of_records;
 
     private final JButton return_button;
-    private final JLabel nickname;
+    private final JLabel panel_name;
     private final JLabel scores;
     private final Image background_image;
     private Image return_button_image;
@@ -57,10 +57,10 @@ public class Highscores extends JPanel
         this.add(return_button);
         setComponentZOrder(return_button, 0);
 
-        nickname = new JLabel("Highscores", SwingConstants.CENTER);
-        nickname.setForeground(Color.CYAN);
-        this.add(nickname);
-        setComponentZOrder(nickname, 0);
+        panel_name = new JLabel("Highscores", SwingConstants.CENTER);
+        panel_name.setForeground(Color.CYAN);
+        this.add(panel_name);
+        setComponentZOrder(panel_name, 0);
 
         scores = new JLabel("", SwingConstants.CENTER);
         scores.setForeground(Color.PINK);
@@ -185,9 +185,9 @@ public class Highscores extends JPanel
         return_button.setLocation((x - button_width)/2, (int) (y * 0.8));
 
         font_size = Math.min((int) (height * 0.069686), (int) (width * 0.045));
-        nickname.setFont(new Font("Serif", Font.PLAIN, font_size));
-        nickname.setSize((int) (width * 0.2125 * 2),(int) (height * 0.08711));
-        nickname.setLocation((width - ((int) (width * 0.2125 * 2)))/2, (int) (height * 0.0348));
+        panel_name.setFont(new Font("Serif", Font.PLAIN, font_size));
+        panel_name.setSize((int) (width * 0.2125 * 2),(int) (height * 0.08711));
+        panel_name.setLocation((width - ((int) (width * 0.2125 * 2)))/2, (int) (height * 0.0348));
 
         scores.setFont(new Font("Serif", Font.PLAIN, font_size));
         scores.setSize((int) (width * 0.2125 * 2),(int) (height * 0.08711 * 8));
