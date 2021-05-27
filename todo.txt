@@ -12,5 +12,22 @@ IDEA :Make JText ZOrder !=0 and add unclickable JLabel at it's place to display 
 
 
 SOUND :
+
 make button sounds quieter
+
+
+Records :
+
+change it from 2 arraylists to just a structure
+
+create an arraylist of Records type
+
+
+
+Window + Highscores :
+
+Records table have to be presented in Highscores and Ending classes, so it can't be stored in Highscores class.
+
+Move it to Window and think how to deal with it.
+
 
