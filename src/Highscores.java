@@ -27,7 +27,6 @@ public class Highscores extends JPanel
 
     private final Sounds click = new Sounds();
 
-    private Records highscore_table;
     private int number_of_records;
 
     private final JButton return_button;
@@ -37,10 +36,8 @@ public class Highscores extends JPanel
     private Image return_button_image;
 
 
-    public Highscores(int x, int y)
+    public Highscores(int x, int y, Records highscore_table)
     {
-        highscore_table = new Records();
-
         width = x;
         height = y;
 
@@ -67,7 +64,7 @@ public class Highscores extends JPanel
         setComponentZOrder(scores, 0);
 
         load_highscore_data_from_file("Highscores.txt", highscore_table);
-        show_scores();
+        show_scores(highscore_table);
     }
 
 
@@ -95,14 +92,14 @@ public class Highscores extends JPanel
                 System.out.println("Highscores file opened");
 
                 String line;
-                int points;
+                double points;
                 int i = 0;
 
                 while ((line = bufferedReader.readLine()) != null)
                 {
                     String[] words = line.split(" ");
 
-                    try {points = Integer.parseInt(words[1]);}
+                    try {points = Double.parseDouble(words[1]);}
                     catch (NumberFormatException e) {points = 0;}
 
                     table.addValues(words[0], points);
@@ -134,11 +131,11 @@ public class Highscores extends JPanel
     }
 
 
-    public void show_scores()
+    public void show_scores(Records table)
     {
         String tmp_string;
         int tmp_int = 0;
-        number_of_records = highscore_table.getNumber_of_records();
+        number_of_records = table.getNumber_of_records();
 
         if (number_of_records == 0)
         {
@@ -152,20 +149,20 @@ public class Highscores extends JPanel
 
                 for (int i = 0; i < Math.min(number_of_records - 1, 6); i++)
                 {
-                    tmp_string = tmp_string + (i + 1) + ". " + highscore_table.getNickname(i) + " : "
-                            + highscore_table.getPoints(i) + "<br>";
+                    tmp_string = tmp_string + (i + 1) + ". " + table.getNickname(i) + " : "
+                            + table.getPoints(i) + "<br>";
 
                     tmp_int = i;
                 }
 
                 tmp_int++;
 
-                tmp_string = tmp_string + (tmp_int + 1) + ". " + highscore_table.getNickname(tmp_int) + " : "
-                        + highscore_table.getPoints(tmp_int) + "</html>";
+                tmp_string = tmp_string + (tmp_int + 1) + ". " + table.getNickname(tmp_int) + " : "
+                        + table.getPoints(tmp_int) + "</html>";
             }
             else
             {
-                tmp_string = "1. " + highscore_table.getNickname(0) + " : " + highscore_table.getPoints(0);
+                tmp_string = "1. " + table.getNickname(0) + " : " + table.getPoints(0);
             }
         }
 

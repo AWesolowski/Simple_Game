@@ -19,6 +19,8 @@ public class Window extends JFrame
     private String players_nick;
     private int lines_numb;
 
+    private Records highscore_table;
+
     private String title = "Shoot the ravens";
 
     private Menu menu;
@@ -26,6 +28,8 @@ public class Window extends JFrame
     private Highscores highscores;
     private Options options;
     private Difficulty difficulty;
+    private Game game;
+    private Ending ending;
     private Music music;
 
     private Window()
@@ -43,14 +47,15 @@ public class Window extends JFrame
 
         CustomCursor();
 
+        highscore_table = new Records();
+
         menu = new Menu(window_width, window_height);
         nick = new Nick(window_width, window_height);
-        highscores = new Highscores(window_width, window_height);
+        highscores = new Highscores(window_width, window_height, highscore_table);
         options = new Options(window_width, window_height);
         difficulty = new Difficulty(window_width, window_height);
         music = new Music();
         music.CustomSoundBackground(filepath_sounds + "background_music.wav");
-
     }
 
     public void CustomCursor()
@@ -248,40 +253,93 @@ public class Window extends JFrame
             }
         }
 
-        if (difficulty.getState() == 1)
-        {
+        int difficulty_lvl = difficulty.getState();
+        difficulty.setState(0);
 
+        if (difficulty_lvl == 1)
+        {
+            game = new Game(window_width, window_height, 1);
+            call_game();
         }
-        else if (difficulty.getState() == 2)
+        else if (difficulty_lvl == 2)
         {
-
+            game = new Game(window_width, window_height, 2);
+            call_game();
         }
-        else if (difficulty.getState() == 3)
+        else if (difficulty_lvl == 3)
         {
-
+            game = new Game(window_width, window_height, 3);
+            call_game();
         }
-        else if (difficulty.getState() == 4)
+        else if (difficulty_lvl == 4)
         {
-
+            game = new Game(window_width, window_height, 4);
+            call_game();
         }
-        else if (difficulty.getState() == 5)
+        else if (difficulty_lvl == 5)
         {
-
-        }else if (difficulty.getState() == -1)
+            game = new Game(window_width, window_height, 5);
+            call_game();
+        }
+        else if (difficulty_lvl == -1)
         {
-            difficulty.setState(0);
             call_nick();
         }
 
     }
 
 
+    private void call_game()
+    {
+        game.setSize(window_width, window_height);
+        this.add(game);
+        repaint();
+
+        while (true)
+        {
+            try {Thread.sleep(100);}
+            catch (InterruptedException e){}
+            if (game.getState() != 0)
+            {
+                getContentPane().removeAll();
+                break;
+            }
+        }
+
+        if (game.getState() == 1)
+        {
+            ending = new Ending(window_width, window_height, game.getPoints(), nick.getPlayers_nick(), highscore_table);
+
+            game.setState(0);
+            call_ending();
+        }
+    }
 
 
+    private void call_ending()
+    {
+        ending.setSize((int) (window_width * 0.6), (int) (window_height * 0.6));
+        add(ending);
+        repaint();
 
+        while(true)
+        {
+            try {Thread.sleep(100);}
+            catch (InterruptedException ex){}
+            if (ending.getState() != 0)
+            {
+                getContentPane().removeAll();
+                break;
+            }
+            else continue;
+        }
 
-
-
+        if (ending.getState() == 1)
+        {
+            ending.setState(0);
+            call_menu();
+        }
+    }
 
 
     public static void main(String[] args)

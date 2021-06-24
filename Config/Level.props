@@ -1,0 +1,6 @@
+scores=0
+lvlscore=1
+boost=1
+miss=10
+points=-1.0f
+wsp=0.1f
