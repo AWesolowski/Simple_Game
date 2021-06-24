@@ -4,3 +4,6 @@ boost=1
 miss=10
 points=-1.0f
 wsp=0.1f
+number_of_levels=5
+zmianaStopniatrudnosci=25
+poczatkowaszerokoscobiektu=8

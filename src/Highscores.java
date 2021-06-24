@@ -21,13 +21,9 @@ public class Highscores extends JPanel
     private final String filepath_buttons = "Images/Buttons/";
     private final String filepath_sounds = "Sounds/";
 
-    private boolean file_exist = true;
-
     private int state = 0;
 
     private final Sounds click = new Sounds();
-
-    private int number_of_records;
 
     private final JButton return_button;
     private final JLabel panel_name;
@@ -110,7 +106,6 @@ public class Highscores extends JPanel
             {
                 System.out.println("Highscores file do not exist");
                 e.printStackTrace();
-                file_exist = false;
             }
             catch (IOException e)
             {
@@ -126,7 +121,6 @@ public class Highscores extends JPanel
         else
         {
             System.out.println("Highscores file do not exist");
-            file_exist = false;
         }
     }
 
@@ -135,7 +129,7 @@ public class Highscores extends JPanel
     {
         String tmp_string;
         int tmp_int = 0;
-        number_of_records = table.getNumber_of_records();
+        int number_of_records = table.getNumber_of_records();
 
         if (number_of_records == 0)
         {

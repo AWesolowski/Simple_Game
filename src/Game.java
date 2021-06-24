@@ -3,71 +3,69 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
+import java.util.ArrayList;
 import java.util.Random;
 
 
 public class Game extends JPanel implements ActionListener
 {
-    private int liczbaPoziomow = 5;
-    private float zmianastopniatrudnosci = 25;
-    private float poczatkowaszerokoscobiektu = 8;
-
     private int width;
     private int height;
 
-    private FileR fr = new FileR();
-    private int scores = fr.geTsco();
     public int state = 0;
-    private int lvlscore = fr.geTlvlsco();
-    private double randd = 1;
-    private double randy = 1;
-    private int boost = fr.getboo();
+    private boolean paused = false;
+
+    private final Offline_Parser fr = new Offline_Parser();
+    private int scores = 0;
+    private int lvlscore = 1;
+    private int speed_boost = fr.getboo();
+    private int lives_left = fr.geTmi(); //Liczba żyć
     public double points = fr.geTpoi();
-    private int miss = fr.geTmi();
-    private Random generator = new Random();
-    private Rectangle2D rect;
-    private double x = 100, y = 100, velx = 0.7, vely = 0.7;
-    private javax.swing.Timer t = new javax.swing.Timer(5,this);
-    private long start = System.currentTimeMillis();
-    private long time;
+    public double wsp = fr.geTws();
+
+    private int liczbaPoziomow = fr.getNumberOfLevels();
+    private double zmianastopniatrudnosci = fr.getZmianaStopniaTrudnosci();
+    private double poczatkowaszerokoscobiektu = fr.getPoczatkowaszerokoscObiektu();
+
+    private final Random generator = new Random();
+    private double rand_x = 1;
+    private double rand_y = 1;
+    private double x = 100, y = 100, velocity_x = 0.7, velocity_y = 0.7;
+    private ArrayList<Integer> x_list = new ArrayList<>();
+    private ArrayList<Integer> y_list = new ArrayList<>();
+    private ArrayList<Double> x_velocity_list = new ArrayList<>();
+    private ArrayList<Double> y_velocity_list = new ArrayList<>();
+
     private int sizer;
+    private double objects_size;
+
     private int count_lvl = 0;
-    //public float wsp = fr.geTws();
-    public float wsp = 0.2f;
     public int pointsMultiplier;
 
-    public int lines_numb;
-    public Records highscores_tab;
-    public boolean file_exist;
-    public boolean shorten;
-    String g_name;
-    private boolean was_changed = false;
-    private BufferedWriter bw = null;
+    private javax.swing.Timer t = new javax.swing.Timer(5,this);
+    private long start = System.currentTimeMillis();
 
-    private String filepath = "Config/Highscores.txt";
     private final String filepath_Background = "Images/";
     private final String filepath_Game_Images = "Images/Game/";
     private final String filepath_sounds = "Sounds/";
 
-
-    private float objects_size;
-
-
     private final Sounds click = new Sounds();
+
+    private ArrayList<Rectangle2D> rect_list = new ArrayList<>();
+    private Rectangle2D rect;
 
     private JLabel TimeLeft;
     private JLabel score;
-    private JLabel misses;
+    private JLabel lives;
     private JLabel levels;
     private Image enemy_image;
     private Image background_image;
-    private ImageIcon image;
 
     private MouseAdapter mouse_adapter;
+    private KeyAdapter key_adapter;
 
 
-    public Game(int gx, int gy, int multiplier)
+    public Game(int gx, int gy, int multiplier, boolean connection_status)
     {
         width = gx;
         height = gy;
@@ -75,6 +73,18 @@ public class Game extends JPanel implements ActionListener
 
         objects_size = poczatkowaszerokoscobiektu/100;
         sizer = (int)(objects_size * (float)width);
+
+        Random r = new Random();
+        for (int i = 0 ; i < 3 ; i++)
+        {
+            rand_x = sizer/2 + r.nextInt(width - sizer);
+            rand_y = sizer/2 + r.nextInt(height - sizer);
+            x_list.add((int)rand_x);
+            y_list.add((int)rand_y);
+
+            x_velocity_list.add(r.nextDouble()/100);
+            y_velocity_list.add(r.nextDouble()/100);
+        }
 
         background_image = Toolkit.getDefaultToolkit().getImage(filepath_Background + "Game_Background.gif");
 
@@ -85,9 +95,9 @@ public class Game extends JPanel implements ActionListener
         add(score);
         scored();
 
-        misses = new JLabel("Misses left");
-        add(misses);
-        misses();
+        lives = new JLabel("Lives left");
+        add(lives);
+        collisions();
 
         levels = new JLabel("Level");
         add(levels);
@@ -101,14 +111,14 @@ public class Game extends JPanel implements ActionListener
          *Tworzenie nowych obiektów po trafieniu lub zliczanie nie trafionych strzałów w zależnosci od tego do czego
          * mamy strzelać figury geometryczne (kwadrat,kółko,trójkąt,prostokąt) czy też obiektów graficznych.
          */
-        addMouseListener(mouse_adapter = new MouseAdapter()
+        this.addMouseListener(mouse_adapter = new MouseAdapter()
         {
             public void mouseClicked(MouseEvent me)
             {
                 super.mouseClicked(me);
                 click.playSound(filepath_sounds + "click.wav");
 
-                if(rect.contains(me.getPoint()))
+                if(rect_list.get(0).contains(me.getPoint()) || rect_list.get(1).contains(me.getPoint()) || rect_list.get(2).contains(me.getPoint()))
                 {
                     x = generator.nextInt(width - sizer * 2) + sizer;
                     y = generator.nextInt(height - sizer * 2) + sizer;
@@ -118,19 +128,60 @@ public class Game extends JPanel implements ActionListener
                 else {
                     if (pointsMultiplier != 1)
                     {
-                        miss--;
-                        System.out.println(miss);
-                        if (miss == 0)
+                        lives_left--;
+                        System.out.println(lives_left);
+                        if (lives_left == 0)
                         {
                             EndGame();
                         }
-                        misses();
+                        collisions();
                         repaint();
                     }
 
                 }
             }
         });
+
+        this.addKeyListener(key_adapter = new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                System.out.println("Key pressed");
+            }
+
+            public void keyPressed(KeyEvent e)
+            {
+                super.keyPressed(e);
+                setFocusable(true);
+                requestFocusInWindow();
+                System.out.println("Key pressed");
+
+                int keyCode = e.getKeyCode();
+
+                if (keyCode == KeyEvent.VK_ESCAPE)
+                {
+                    pause();
+                }
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                System.out.println("Key pressed");
+            }
+        });
+    }
+
+
+    private void pause()
+    {
+        if (paused)
+        {
+            t.addActionListener(this);
+        }
+        else t.removeActionListener(this);
     }
 
 
@@ -160,11 +211,11 @@ public class Game extends JPanel implements ActionListener
         if (points > 1)
         {
             click.playSound(filepath_sounds + "click.wav");
-            boost++;
+            speed_boost++;
 
-            boost = boost + 5;
+            speed_boost = speed_boost + 5;
 
-            move(boost);
+            move(speed_boost);
         }
 
         if ((scores % 16) == 0 && scores > 1)
@@ -202,16 +253,16 @@ public class Game extends JPanel implements ActionListener
                 }
             }
         }
-        score.setText("Score: " + (int)points);
 
+        score.setText("Score: " + (int)points);
         score.setForeground(Color.red);
     }
 
 
-    public void misses(){
-        misses.setBounds(15, 20, 300, 30);
-        misses.setText("Misses Left: " + miss);
-        misses.setForeground(Color.red);
+    public void collisions(){
+        lives.setBounds(15, 20, 300, 30);
+        lives.setText("Lives Left: " + lives_left);
+        lives.setForeground(Color.red);
     }
 
 
@@ -238,30 +289,47 @@ public class Game extends JPanel implements ActionListener
         t.removeActionListener(this);
         t.stop();
         removeMouseListener(mouse_adapter);
+        removeKeyListener(key_adapter);
         state = 1;
     }
 
 
     public void actionPerformed(ActionEvent e)
     {
-        if ((time = System.currentTimeMillis() - start) / 1000F >= 100)
+        if ((System.currentTimeMillis() - start) / 1000F >= 100)
         {
             System.out.println("koniec");
             EndGame();
         }
         else {
-            if (x <= 0 || x >= width - sizer)
+            for (int i = 0 ; i < x_list.size() ; i++)
             {
-                velx = -velx;
+                if (x_list.get(i) <= 0 || x_list.get(i) >= width - sizer)
+                {
+                    x_velocity_list.set(i, -x_velocity_list.get(i));
+                }
+                if (y_list.get(i) <= 0 || y_list.get(i) >= height - sizer)
+                {
+                    y_velocity_list.set(i, -y_velocity_list.get(i));
+                }
+                x_list.set(i, (int) (x_list.get(i) + rand_x * (1 + wsp * speed_boost) * x_velocity_list.get(i)));
+                y_list.set(i, (int) (y_list.get(i) + rand_y * (1 + wsp * speed_boost) * y_velocity_list.get(i)));
+                game_time_counter();
+                repaint();
             }
-            if (y <= 0 || y >= height - sizer)
-            {
-                vely = -vely;
-            }
-            x += randd * (1 + wsp * boost) * velx;
-            y += randy * (1 + wsp * boost) * vely;
-            game_time_counter();
-            repaint();
+
+//            if (x <= 0 || x >= width - sizer)
+//            {
+//                velocity_x = -velocity_x;
+//            }
+//            if (y <= 0 || y >= height - sizer)
+//            {
+//                velocity_y = -velocity_y;
+//            }
+//            x += rand_x * (1 + wsp * speed_boost) * velocity_x;
+//            y += rand_y * (1 + wsp * speed_boost) * velocity_y;
+//            game_time_counter();
+//            repaint();
         }
     }
 
@@ -269,11 +337,20 @@ public class Game extends JPanel implements ActionListener
     public void move(int boost)
     {
         Random r = new Random();
-        randd = -1 + (1 - -1) * r.nextDouble();
-        randy = -1 + (1 - -1) * r.nextDouble();
-        x += randd * (1 + 0.5 * boost) * velx;
-        y += randy * (1 + 0.5 * boost) * vely;
-        repaint();
+
+        for (int i = 0 ; i < x_list.size() ; i++)
+        {
+            rand_x = -1 + (1 - -1) * r.nextDouble();
+            rand_y = -1 + (1 - -1) * r.nextDouble();
+            x_list.set(i, (int) (x_list.get(i) + rand_x * (1 + 0.5 * boost) * x_velocity_list.get(i)));
+            y_list.set(i, (int) (y_list.get(i) + rand_y * (1 + 0.5 * boost) * y_velocity_list.get(i)));
+            repaint();
+        }
+//        rand_x = -1 + (1 - -1) * r.nextDouble();
+//        rand_y = -1 + (1 - -1) * r.nextDouble();
+//        x += rand_x * (1 + 0.5 * boost) * velocity_x;
+//        y += rand_y * (1 + 0.5 * boost) * velocity_y;
+//        repaint();
     }
 
 
@@ -332,17 +409,14 @@ public class Game extends JPanel implements ActionListener
         Graphics2D g2d = (Graphics2D) g;
 
         loadImage();
-        g.drawImage(enemy_image,(int)x,(int)y,sizer,sizer,this);
+        //g.drawImage(enemy_image,(int)x,(int)y,sizer,sizer,this);
 
-        rect = new Rectangle2D.Double((int)x, (int)y, sizer, sizer);
-
-        BufferedImage bi = new BufferedImage(sizer, sizer, BufferedImage.TYPE_INT_RGB);
-        bi.createGraphics().drawImage(enemy_image, (int)x, (int)y, this);
-
-
-        TexturePaint tp = new TexturePaint(bi, rect);
-        g2d.setPaint(tp);
-        g2d.fill(rect);
+        for (int i = 0 ; i < 3 ; i++)
+        {
+            g.drawImage(enemy_image,x_list.get(i),y_list.get(i),sizer,sizer,this);
+            rect_list.add(new Rectangle2D.Double(x_list.get(i), y_list.get(i), sizer, sizer));
+        }
+//        rect = new Rectangle2D.Double((int)x, (int)y, sizer, sizer);
 
         t.start();
     }

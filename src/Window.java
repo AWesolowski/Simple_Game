@@ -9,19 +9,11 @@ public class Window extends JFrame
 
     private long timex = 0;
     private boolean mute = false;
-    private String s_name;
 
-    private String filepath_sounds = "Sounds/";
-
-    private boolean file_exist = true;
-    private boolean shorten = false;
-
-    private String players_nick;
-    private int lines_numb;
+    private final String filepath_sounds = "Sounds/";
+    private final String title = "PANG";
 
     private Records highscore_table;
-
-    private String title = "Shoot the ravens";
 
     private Menu menu;
     private Nick nick;
@@ -32,11 +24,15 @@ public class Window extends JFrame
     private Ending ending;
     private Music music;
 
+    Client client;
+    private JLabel connection_status_label;
+    private boolean connection_status;
+
     private Window()
     {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        window_width = (int)(screenSize.width / 2);
-        window_height = (int)(screenSize.height/2);
+        window_width = screenSize.width / 2;
+        window_height = screenSize.height/2;
 
         this.setSize(window_width, window_height);
         this.setLocationRelativeTo(null);
@@ -56,9 +52,29 @@ public class Window extends JFrame
         difficulty = new Difficulty(window_width, window_height);
         music = new Music();
         music.CustomSoundBackground(filepath_sounds + "background_music.wav");
+
+        connection_status_label = new JLabel();
     }
 
-    public void CustomCursor()
+    private void conncet_to_server()
+    {
+        connection_status_label.setBounds(window_width - 150, 15, 300, 30);
+        connection_status_label.setText("Waiting for server");
+        connection_status_label.setForeground(Color.red);
+
+        client = new Client();
+        connection_status = client.otworzPolaczenie("Adam", 8080);
+
+        if (connection_status)
+        {
+            connection_status_label.setText("Connected");
+            connection_status_label.setForeground(Color.green);
+        }
+        else connection_status_label.setText("Failed to connect");
+
+    }
+
+    private void CustomCursor()
     {
         Image cursor_img = Toolkit.getDefaultToolkit().getImage("Images/Cursor.png");
         Point points = new Point(15, 15);
@@ -71,8 +87,11 @@ public class Window extends JFrame
         int state;
 
         menu.setSize(window_width, window_height);
+        menu.add(connection_status_label);
         this.add(menu);
         repaint();
+
+        conncet_to_server();
 
         while (true)
         {
@@ -101,7 +120,6 @@ public class Window extends JFrame
             menu.setState(0);
             call_options();
         }
-
     }
 
 
@@ -124,7 +142,6 @@ public class Window extends JFrame
 
         if (nick.getState() == 1)
         {
-            players_nick = nick.getPlayers_nick();
             nick.setState(0);
             call_difficulty();
         }
@@ -224,7 +241,6 @@ public class Window extends JFrame
                     }
                     options.setMute_state(false);
                 }
-
             }
         }
 
@@ -258,34 +274,33 @@ public class Window extends JFrame
 
         if (difficulty_lvl == 1)
         {
-            game = new Game(window_width, window_height, 1);
+            game = new Game(window_width, window_height, 1, connection_status);
             call_game();
         }
         else if (difficulty_lvl == 2)
         {
-            game = new Game(window_width, window_height, 2);
+            game = new Game(window_width, window_height, 2, connection_status);
             call_game();
         }
         else if (difficulty_lvl == 3)
         {
-            game = new Game(window_width, window_height, 3);
+            game = new Game(window_width, window_height, 3, connection_status);
             call_game();
         }
         else if (difficulty_lvl == 4)
         {
-            game = new Game(window_width, window_height, 4);
+            game = new Game(window_width, window_height, 4, connection_status);
             call_game();
         }
         else if (difficulty_lvl == 5)
         {
-            game = new Game(window_width, window_height, 5);
+            game = new Game(window_width, window_height, 5, connection_status);
             call_game();
         }
         else if (difficulty_lvl == -1)
         {
             call_nick();
         }
-
     }
 
 

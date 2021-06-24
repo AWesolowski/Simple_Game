@@ -15,25 +15,23 @@ public class Client {
     PrintWriter pw = null;
     InputStream is = null;
     BufferedReader br = null;
-    /**
-     * Konstruktor klasy Client
-     * @param _host nazwa hosta
-     * @@param _port numer portu
-     */
-    public Client(String _host,int _port)
+
+
+    public Client()
+    {
+    }
+
+    public boolean otworzPolaczenie(String _host, int _port)
     {
         try {
             /// otworz polaczenie
             socket = new Socket(_host,_port);
+            return true;
         } catch (Exception e) {
             System.err.println("Client exception: " + e);
+            return false;
         }
     }
-    /**
-     * Metoda odpowiadajaca za komunikacja klienta z serwerem - wyslanie polecenia i odebranie odpowiedzi serwera
-     * @param polecenie - tresc polecenia
-     * @return odpowiedz serwera
-     */
 
     public String wyslijPolecenie(String polecenie)
     {
