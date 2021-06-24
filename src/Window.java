@@ -274,27 +274,27 @@ public class Window extends JFrame
 
         if (difficulty_lvl == 1)
         {
-            game = new Game(window_width, window_height, 1, connection_status);
+            game = new Game(window_width, window_height, 1, connection_status, client);
             call_game();
         }
         else if (difficulty_lvl == 2)
         {
-            game = new Game(window_width, window_height, 2, connection_status);
+            game = new Game(window_width, window_height, 2, connection_status, client);
             call_game();
         }
         else if (difficulty_lvl == 3)
         {
-            game = new Game(window_width, window_height, 3, connection_status);
+            game = new Game(window_width, window_height, 3, connection_status, client);
             call_game();
         }
         else if (difficulty_lvl == 4)
         {
-            game = new Game(window_width, window_height, 4, connection_status);
+            game = new Game(window_width, window_height, 4, connection_status, client);
             call_game();
         }
         else if (difficulty_lvl == 5)
         {
-            game = new Game(window_width, window_height, 5, connection_status);
+            game = new Game(window_width, window_height, 5, connection_status, client);
             call_game();
         }
         else if (difficulty_lvl == -1)

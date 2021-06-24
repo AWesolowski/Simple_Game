@@ -24,10 +24,3 @@ create an arraylist of Records type
 
 
 
-Window + Highscores :
-
-Records table have to be presented in Highscores and Ending classes, so it can't be stored in Highscores class.
-
-Move it to Window and think how to deal with it.
-
-

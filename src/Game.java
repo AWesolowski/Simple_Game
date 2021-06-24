@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,22 +14,22 @@ public class Game extends JPanel implements ActionListener
     public int state = 0;
     private boolean paused = false;
 
-    private final Offline_Parser fr = new Offline_Parser();
     private int scores = 0;
     private int lvlscore = 1;
-    private int speed_boost = fr.getboo();
-    private int lives_left = fr.geTmi(); //Liczba żyć
-    public double points = fr.geTpoi();
-    public double wsp = fr.geTws();
+    public double points = 0;
 
-    private int liczbaPoziomow = fr.getNumberOfLevels();
-    private double zmianastopniatrudnosci = fr.getZmianaStopniaTrudnosci();
-    private double poczatkowaszerokoscobiektu = fr.getPoczatkowaszerokoscObiektu();
+    private  Offline_Parser fr;
+    private int speed_boost;
+    private int lives_left;
+    public double wsp;
+    private int number_of_levels;
+    private double difficulty_change;
+    private double starting_object_size;
+    private int number_of_enemies;
 
     private final Random generator = new Random();
     private double rand_x = 1;
     private double rand_y = 1;
-    private double x = 100, y = 100, velocity_x = 0.7, velocity_y = 0.7;
     private ArrayList<Integer> x_list = new ArrayList<>();
     private ArrayList<Integer> y_list = new ArrayList<>();
     private ArrayList<Double> x_velocity_list = new ArrayList<>();
@@ -65,17 +64,39 @@ public class Game extends JPanel implements ActionListener
     private KeyAdapter key_adapter;
 
 
-    public Game(int gx, int gy, int multiplier, boolean connection_status)
+    public Game(int gx, int gy, int multiplier, boolean connection_status, Client client)
     {
         width = gx;
         height = gy;
         pointsMultiplier = multiplier;
 
-        objects_size = poczatkowaszerokoscobiektu/100;
+        objects_size = starting_object_size/100;
         sizer = (int)(objects_size * (float)width);
 
+        if (connection_status)
+        {
+//            speed_boost = fr.getSpeed_boost();
+//            lives_left = fr.getCollisions_available();
+//            wsp = fr.getSpeed_parameter();
+//            number_of_levels = fr.getNumber_of_levels();
+//            difficulty_change = fr.getDifficulty_change();
+//            starting_object_size = fr.getStarting_object_size();
+//            number_of_enemies = fr.getNumber_of_enemies();
+        }
+        else
+        {
+            fr = new Offline_Parser();
+            speed_boost = fr.getSpeed_boost();
+            lives_left = fr.getCollisions_available();
+            wsp = fr.getSpeed_parameter();
+            number_of_levels = fr.getNumber_of_levels();
+            difficulty_change = fr.getDifficulty_change();
+            starting_object_size = fr.getStarting_object_size();
+            number_of_enemies = fr.getNumber_of_enemies();
+        }
+
         Random r = new Random();
-        for (int i = 0 ; i < 3 ; i++)
+        for (int i = 0; i < number_of_enemies; i++)
         {
             rand_x = sizer/2 + r.nextInt(width - sizer);
             rand_y = sizer/2 + r.nextInt(height - sizer);
@@ -197,15 +218,15 @@ public class Game extends JPanel implements ActionListener
         }
         else if (pointsMultiplier == 3)
         {
-            points = points + 1+1*((zmianastopniatrudnosci)/100) ;
+            points = points + 1+1*((difficulty_change)/100) ;
         }
         else if (pointsMultiplier == 4)
         {
-            points = points + 1 + (1 * 2 * (((zmianastopniatrudnosci)/100)));
+            points = points + 1 + (1 * 2 * (((difficulty_change)/100)));
         }
         else if (pointsMultiplier == 5)
         {
-            points = points + 1 + (1 * 4 * (((zmianastopniatrudnosci)/100)));
+            points = points + 1 + (1 * 4 * (((difficulty_change)/100)));
         }
 
         if (points > 1)
@@ -220,7 +241,7 @@ public class Game extends JPanel implements ActionListener
 
         if ((scores % 16) == 0 && scores > 1)
         {
-            if (lvlscore <= liczbaPoziomow)
+            if (lvlscore <= number_of_levels)
             {
                 count_lvl++;
 
@@ -302,7 +323,7 @@ public class Game extends JPanel implements ActionListener
             EndGame();
         }
         else {
-            for (int i = 0 ; i < x_list.size() ; i++)
+            for (int i = 0; i < number_of_enemies; i++)
             {
                 if (x_list.get(i) <= 0 || x_list.get(i) >= width - sizer)
                 {
@@ -338,7 +359,7 @@ public class Game extends JPanel implements ActionListener
     {
         Random r = new Random();
 
-        for (int i = 0 ; i < x_list.size() ; i++)
+        for (int i = 0; i < number_of_enemies; i++)
         {
             rand_x = -1 + (1 - -1) * r.nextDouble();
             rand_y = -1 + (1 - -1) * r.nextDouble();
@@ -411,7 +432,7 @@ public class Game extends JPanel implements ActionListener
         loadImage();
         //g.drawImage(enemy_image,(int)x,(int)y,sizer,sizer,this);
 
-        for (int i = 0 ; i < 3 ; i++)
+        for (int i = 0; i < number_of_enemies; i++)
         {
             g.drawImage(enemy_image,x_list.get(i),y_list.get(i),sizer,sizer,this);
             rect_list.add(new Rectangle2D.Double(x_list.get(i), y_list.get(i), sizer, sizer));

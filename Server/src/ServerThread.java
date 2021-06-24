@@ -54,51 +54,35 @@ public class ServerThread extends Thread {
             /// wysluchiwanie nadchodzacych polecen od klienta dopoki nie zakonczy polaczenia przez quit
             while (fromClient.compareTo("quit") != 0) {
                 /// reakcja na zdanie protokolu
-                if (fromClient.equals("getScores"))
+                if (fromClient.equals("get_speed_boost"))
                 {
-                    odpowiedz = Integer.toString(parametry.geTsco());
+                    odpowiedz = Integer.toString(parametry.getSpeed_boost());
                 }
-                else if (fromClient.equals("getlvlscore"))
+                else if (fromClient.equals("get_collisions_available"))
                 {
-                    odpowiedz = Integer.toString(parametry.geTsco());
+                    odpowiedz = Integer.toString(parametry.getCollisions_available());
                 }
-                else if (fromClient.equals("getScores"))
+                else if (fromClient.equals("get_speed_parameter"))
                 {
-                    odpowiedz = Integer.toString(parametry.geTsco());
+                    odpowiedz = Double.toString(parametry.getSpeed_parameter());
                 }
-                else if (fromClient.equals("getScores"))
+                else if (fromClient.equals("get_number_of_levels"))
                 {
-                    odpowiedz = Integer.toString(parametry.geTsco());
+                    odpowiedz = Integer.toString(parametry.getNumber_of_levels());
                 }
-                else if (fromClient.equals("getScores"))
+                else if (fromClient.equals("get_difficulty_change"))
                 {
-                    odpowiedz = Integer.toString(parametry.geTsco());
+                    odpowiedz = Double.toString(parametry.getDifficulty_change());
                 }
-
-
-                if (fromClient.equals("getLiczbaPoziomow")) {
-                    odpowiedz = Integer.toString(parametry.getLiczbaPoziomow());
-                } else if (fromClient.equals("getStartNum")) {
-                    odpowiedz = Integer.toString(parametry.getNumeracjaPoziomowZaczynaSieOd());
-                } else if (fromClient.equals("getLiczbaStopniTrudnosci")) {
-                    odpowiedz = Integer.toString(parametry.getLiczbaStopniTrudnosci());
-                } else if (fromClient.equals("getFigura")) {
-                    odpowiedz = parametry.getFiguraObiektuGry();
-                } else if (fromClient.equals("getPlikTla")) {
-                    odpowiedz = parametry.getPlikTla();
-                } else if (fromClient.equals("getPlikObiektu")) {
-                    odpowiedz = parametry.getPlikObiektu();
-                } else if (fromClient.equals("jakaZmianaStopniaTrudnosci")) {
-                    odpowiedz = Integer.toString(parametry.getZmianaStopniaTrudnosci());
-                } else if (fromClient.equals("getSzerokosc")) {
-                    odpowiedz = Integer.toString(parametry.getPoczatkowaSzerokoscPlanszy());
-                } else if (fromClient.equals("getProcent")) {
-                    odpowiedz = Double.toString(parametry.getPoczatkowaSzerokoscObiektuGryJakoProcentPoczatkowejSzerokosciPlanszy());
-                } else if (fromClient.equals("getNazwa")) {
-                    odpowiedz = parametry.getNazwaGry();
-                } else if (fromClient.equals("getNazwaOpisu")) {
-                    odpowiedz = parametry.getNazwaBazowaPlikuZOpisemPoziomu();
-                } else if (fromClient.contains("newScore")) {
+                else if (fromClient.equals("get_starting_object_size"))
+                {
+                    odpowiedz = Double.toString(parametry.getStarting_object_size());
+                }
+                else if (fromClient.equals("get_starting_number_of_enemies"))
+                {
+                    odpowiedz = Integer.toString(parametry.getNumber_of_enemies());
+                }/////
+                else if (fromClient.contains("newScore")) {
                     try {///Zapisz do pliku (ranking) - dodaj nowa linie zwierajaca ostatni wynik
                         Files.write(Paths.get("./Highscores"), (fromClient.substring(14) + "=" + fromClient.substring(9, 13) + "\n").getBytes(), StandardOpenOption.APPEND);
                     } catch (IOException e) {
