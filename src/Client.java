@@ -5,8 +5,8 @@ import java.io.*;
 /**
  * Klient do realizacji protokolu sieciowego
  *
- * @author SJ RK
- * @version 1.0.0  26 maja 2019 21:30
+ * @author AW KK
+ * @version 1.0.0  24 czerca 2021 17:00
  */
 public class Client {
 
@@ -21,6 +21,11 @@ public class Client {
     {
     }
 
+    /**
+     * Metoda otwierajaca polaczenie z serwerem
+     * @param _host nazwa hosta
+     * @@param _port numer portu
+     */
     public boolean otworzPolaczenie(String _host, int _port)
     {
         try {
@@ -33,6 +38,11 @@ public class Client {
         }
     }
 
+    /**
+     * Metoda odpowiadajaca za komunikacja klienta z serwerem - wyslanie polecenia i odebranie odpowiedzi serwera
+     * @param String - tresc polecenia
+     * @return odpowiedz serwera
+     */
     public String wyslijPolecenie(String polecenie)
     {
         String odpowiedz = "";

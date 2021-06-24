@@ -5,6 +5,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static java.lang.Integer.parseInt;
+
 
 public class Game extends JPanel implements ActionListener
 {
@@ -12,7 +14,7 @@ public class Game extends JPanel implements ActionListener
     private int height;
 
     public int state = 0;
-    private boolean paused = false;
+    private boolean paused = true;
 
     private int scores = 0;
     private int lvlscore = 1;
@@ -28,12 +30,18 @@ public class Game extends JPanel implements ActionListener
     private int number_of_enemies;
 
     private final Random generator = new Random();
-    private double rand_x = 1;
-    private double rand_y = 1;
-    private ArrayList<Integer> x_list = new ArrayList<>();
-    private ArrayList<Integer> y_list = new ArrayList<>();
-    private ArrayList<Double> x_velocity_list = new ArrayList<>();
-    private ArrayList<Double> y_velocity_list = new ArrayList<>();
+    private double rand_x;
+    private double rand_y;
+
+    private int x1, x2, x3, x4, x5;
+    private int y1, y2, y3, y4, y5;
+    private double x1_velocity, x2_velocity, x3_velocity, x4_velocity, x5_velocity;
+    private double y1_velocity, y2_velocity, y3_velocity, y4_velocity, y5_velocity;
+
+    private double mouse_x;
+    private double mouse_y;
+    private double screen_width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+    private double screen_height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 
     private int sizer;
     private double objects_size;
@@ -51,7 +59,7 @@ public class Game extends JPanel implements ActionListener
     private final Sounds click = new Sounds();
 
     private ArrayList<Rectangle2D> rect_list = new ArrayList<>();
-    private Rectangle2D rect;
+    private Rectangle2D rect1, rect2, rect3, rect4, rect5;
 
     private JLabel TimeLeft;
     private JLabel score;
@@ -61,7 +69,8 @@ public class Game extends JPanel implements ActionListener
     private Image background_image;
 
     private MouseAdapter mouse_adapter;
-    private KeyAdapter key_adapter;
+    private PointerInfo pointerInfo;
+    private Point point;
 
 
     public Game(int gx, int gy, int multiplier, boolean connection_status, Client client)
@@ -70,18 +79,15 @@ public class Game extends JPanel implements ActionListener
         height = gy;
         pointsMultiplier = multiplier;
 
-        objects_size = starting_object_size/100;
-        sizer = (int)(objects_size * (float)width);
-
         if (connection_status)
         {
-//            speed_boost = fr.getSpeed_boost();
-//            lives_left = fr.getCollisions_available();
-//            wsp = fr.getSpeed_parameter();
-//            number_of_levels = fr.getNumber_of_levels();
-//            difficulty_change = fr.getDifficulty_change();
-//            starting_object_size = fr.getStarting_object_size();
-//            number_of_enemies = fr.getNumber_of_enemies();
+            speed_boost = parseInt(client.wyslijPolecenie("get_speed_boost"));
+            lives_left = parseInt(client.wyslijPolecenie("get_collisions_available"));
+            wsp = Double.parseDouble(client.wyslijPolecenie("get_speed_parameter"));
+            number_of_levels = parseInt(client.wyslijPolecenie("get_number_of_levels"));
+            difficulty_change = Double.parseDouble(client.wyslijPolecenie("get_difficulty_change"));
+            starting_object_size = Double.parseDouble(client.wyslijPolecenie("get_starting_object_size"));
+            number_of_enemies = parseInt(client.wyslijPolecenie("get_starting_number_of_enemies"));
         }
         else
         {
@@ -95,17 +101,55 @@ public class Game extends JPanel implements ActionListener
             number_of_enemies = fr.getNumber_of_enemies();
         }
 
-        Random r = new Random();
-        for (int i = 0; i < number_of_enemies; i++)
-        {
-            rand_x = sizer/2 + r.nextInt(width - sizer);
-            rand_y = sizer/2 + r.nextInt(height - sizer);
-            x_list.add((int)rand_x);
-            y_list.add((int)rand_y);
+        objects_size = starting_object_size/100;
+        sizer = (int)(objects_size * (float)width);
 
-            x_velocity_list.add(r.nextDouble()/100);
-            y_velocity_list.add(r.nextDouble()/100);
+        Random r = new Random();
+        x1_velocity = r.nextDouble()/500;
+        y1_velocity = r.nextDouble()/500;
+        rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+        rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+        x1 = (int) rand_x;
+        y1 = (int) rand_y;
+
+        if (number_of_enemies > 1 && number_of_enemies < 3)
+        {
+            x2_velocity = r.nextDouble()/500;
+            y2_velocity = r.nextDouble()/500;
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x2 = (int) rand_x;
+            y2 = (int) rand_y;
         }
+        else if (number_of_enemies > 2 && number_of_enemies < 4)
+        {
+            x3_velocity = r.nextDouble()/500;
+            y3_velocity = r.nextDouble()/500;
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x3 = (int) rand_x;
+            y3 = (int) rand_y;
+        }
+        else if (number_of_enemies > 3 && number_of_enemies < 5)
+        {
+            x4_velocity = r.nextDouble()/500;
+            y4_velocity = r.nextDouble()/500;
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x4 = (int) rand_x;
+            y4 = (int) rand_y;
+        }
+        else if (number_of_enemies > 4)
+        {
+            x5_velocity = r.nextDouble()/500;
+            y5_velocity = r.nextDouble()/500;
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x5 = (int) rand_x;
+            y5 = (int) rand_y;
+        }
+
+
 
         background_image = Toolkit.getDefaultToolkit().getImage(filepath_Background + "Game_Background.gif");
 
@@ -134,15 +178,44 @@ public class Game extends JPanel implements ActionListener
          */
         this.addMouseListener(mouse_adapter = new MouseAdapter()
         {
+
             public void mouseClicked(MouseEvent me)
             {
                 super.mouseClicked(me);
                 click.playSound(filepath_sounds + "click.wav");
 
-                if(rect_list.get(0).contains(me.getPoint()) || rect_list.get(1).contains(me.getPoint()) || rect_list.get(2).contains(me.getPoint()))
+                if(rect1.contains(me.getPoint()))
                 {
-                    x = generator.nextInt(width - sizer * 2) + sizer;
-                    y = generator.nextInt(height - sizer * 2) + sizer;
+                    x1 = generator.nextInt(width - sizer * 2) + sizer;
+                    y1 = generator.nextInt(height - sizer * 2) + sizer;
+                    scored();
+                    repaint();
+                }
+                else if(number_of_enemies > 1 && number_of_enemies < 3 && rect2.contains(me.getPoint()))
+                {
+                    x2 = generator.nextInt(width - sizer * 2) + sizer;
+                    y2 = generator.nextInt(height - sizer * 2) + sizer;
+                    scored();
+                    repaint();
+                }
+                else if(number_of_enemies > 2 && number_of_enemies < 4 && rect3.contains(me.getPoint()))
+                {
+                    x3 = generator.nextInt(width - sizer * 2) + sizer;
+                    y3 = generator.nextInt(height - sizer * 2) + sizer;
+                    scored();
+                    repaint();
+                }
+                else if(number_of_enemies > 3 && number_of_enemies < 5 && rect4.contains(me.getPoint()))
+                {
+                    x4 = generator.nextInt(width - sizer * 2) + sizer;
+                    y4 = generator.nextInt(height - sizer * 2) + sizer;
+                    scored();
+                    repaint();
+                }
+                else if(number_of_enemies > 4 && rect5.contains(me.getPoint()))
+                {
+                    x5 = generator.nextInt(width - sizer * 2) + sizer;
+                    y5 = generator.nextInt(height - sizer * 2) + sizer;
                     scored();
                     repaint();
                 }
@@ -161,36 +234,17 @@ public class Game extends JPanel implements ActionListener
 
                 }
             }
-        });
 
-        this.addKeyListener(key_adapter = new KeyAdapter()
-        {
             @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
-                System.out.println("Key pressed");
-            }
-
-            public void keyPressed(KeyEvent e)
-            {
-                super.keyPressed(e);
-                setFocusable(true);
-                requestFocusInWindow();
-                System.out.println("Key pressed");
-
-                int keyCode = e.getKeyCode();
-
-                if (keyCode == KeyEvent.VK_ESCAPE)
-                {
-                    pause();
-                }
-
+            public void mouseExited(MouseEvent e) {
+                super.mouseExited(e);
+                pause();
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {
-                super.keyReleased(e);
-                System.out.println("Key pressed");
+            public void mouseEntered(MouseEvent e) {
+                super.mouseEntered(e);
+                pause();
             }
         });
     }
@@ -201,8 +255,13 @@ public class Game extends JPanel implements ActionListener
         if (paused)
         {
             t.addActionListener(this);
+            paused = false;
         }
-        else t.removeActionListener(this);
+        else
+        {
+            t.removeActionListener(this);
+            paused = true;
+        }
     }
 
 
@@ -268,10 +327,6 @@ public class Game extends JPanel implements ActionListener
                 System.out.println(sizer);
                 System.out.println("ROBIE");
                 System.out.println(lvlscore);
-                if (sizer == 25)
-                {
-                    //sizer = sizer;
-                }
             }
         }
 
@@ -310,7 +365,6 @@ public class Game extends JPanel implements ActionListener
         t.removeActionListener(this);
         t.stop();
         removeMouseListener(mouse_adapter);
-        removeKeyListener(key_adapter);
         state = 1;
     }
 
@@ -323,34 +377,70 @@ public class Game extends JPanel implements ActionListener
             EndGame();
         }
         else {
-            for (int i = 0; i < number_of_enemies; i++)
-            {
-                if (x_list.get(i) <= 0 || x_list.get(i) >= width - sizer)
-                {
-                    x_velocity_list.set(i, -x_velocity_list.get(i));
-                }
-                if (y_list.get(i) <= 0 || y_list.get(i) >= height - sizer)
-                {
-                    y_velocity_list.set(i, -y_velocity_list.get(i));
-                }
-                x_list.set(i, (int) (x_list.get(i) + rand_x * (1 + wsp * speed_boost) * x_velocity_list.get(i)));
-                y_list.set(i, (int) (y_list.get(i) + rand_y * (1 + wsp * speed_boost) * y_velocity_list.get(i)));
-                game_time_counter();
-                repaint();
-            }
 
-//            if (x <= 0 || x >= width - sizer)
-//            {
-//                velocity_x = -velocity_x;
-//            }
-//            if (y <= 0 || y >= height - sizer)
-//            {
-//                velocity_y = -velocity_y;
-//            }
-//            x += rand_x * (1 + wsp * speed_boost) * velocity_x;
-//            y += rand_y * (1 + wsp * speed_boost) * velocity_y;
-//            game_time_counter();
-//            repaint();
+            if (x1 <= 0 || x1 >= width - sizer)
+            {
+                x1_velocity = -x1_velocity;
+            }
+            if (y1 <= 0 || y1 >= height - sizer)
+            {
+                y1_velocity = -y1_velocity;
+            }
+            x1 += rand_x * (1 + wsp * speed_boost) * x1_velocity;
+            y1 += rand_y * (1 + wsp * speed_boost) * y1_velocity;
+
+            if (number_of_enemies > 1 && number_of_enemies < 3)
+            {
+                if (x2 <= 0 || x2 >= width - sizer)
+                {
+                    x2_velocity = -x2_velocity;
+                }
+                if (y2 <= 0 || y2 >= height - sizer)
+                {
+                    y2_velocity = -y2_velocity;
+                }
+                x2 += rand_x * (1 + wsp * speed_boost) * x2_velocity;
+                y2 += rand_y * (1 + wsp * speed_boost) * y2_velocity;
+            }
+            else if (number_of_enemies > 2 && number_of_enemies < 4)
+            {
+                if (x3 <= 0 || x3 >= width - sizer)
+                {
+                    x3_velocity = -x3_velocity;
+                }
+                if (y3 <= 0 || y3 >= height - sizer)
+                {
+                    y3_velocity = -y3_velocity;
+                }
+                x3 += rand_x * (1 + wsp * speed_boost) * x3_velocity;
+                y3 += rand_y * (1 + wsp * speed_boost) * y3_velocity;
+            }
+            else if (number_of_enemies > 3 && number_of_enemies < 5)
+            {
+                if (x4 <= 0 || x4 >= width - sizer)
+                {
+                    x4_velocity = -x4_velocity;
+                }
+                if (y4 <= 0 || y4 >= height - sizer)
+                {
+                    y4_velocity = -y4_velocity;
+                }
+                x4 += rand_x * (1 + wsp * speed_boost) * x4_velocity;
+                y4 += rand_y * (1 + wsp * speed_boost) * y4_velocity;
+            }
+            else if (number_of_enemies > 4)
+            {
+                if (x5 <= 0 || x5 >= width - sizer)
+                {
+                    x5_velocity = -x5_velocity;
+                }
+                if (y5 <= 0 || y5 >= height - sizer)
+                {
+                    y5_velocity = -y5_velocity;
+                }
+                x5 += rand_x * (1 + wsp * speed_boost) * x5_velocity;
+                y5 += rand_y * (1 + wsp * speed_boost) * y5_velocity;
+            }
         }
     }
 
@@ -359,19 +449,41 @@ public class Game extends JPanel implements ActionListener
     {
         Random r = new Random();
 
-        for (int i = 0; i < number_of_enemies; i++)
+        rand_x = -1 + (1 - -1) * r.nextDouble();
+        rand_y = -1 + (1 - -1) * r.nextDouble();
+        x1 += rand_x * (1 + 0.5 * boost) * x1_velocity;
+        y1 += rand_y * (1 + 0.5 * boost) * y1_velocity;
+
+        if (number_of_enemies > 1 && number_of_enemies < 3)
         {
-            rand_x = -1 + (1 - -1) * r.nextDouble();
-            rand_y = -1 + (1 - -1) * r.nextDouble();
-            x_list.set(i, (int) (x_list.get(i) + rand_x * (1 + 0.5 * boost) * x_velocity_list.get(i)));
-            y_list.set(i, (int) (y_list.get(i) + rand_y * (1 + 0.5 * boost) * y_velocity_list.get(i)));
-            repaint();
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x2 += rand_x * (1 + 0.5 * boost) * x2_velocity;
+            y2 += rand_y * (1 + 0.5 * boost) * y2_velocity;
         }
-//        rand_x = -1 + (1 - -1) * r.nextDouble();
-//        rand_y = -1 + (1 - -1) * r.nextDouble();
-//        x += rand_x * (1 + 0.5 * boost) * velocity_x;
-//        y += rand_y * (1 + 0.5 * boost) * velocity_y;
-//        repaint();
+        else if (number_of_enemies > 2 && number_of_enemies < 4)
+        {
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x3 += rand_x * (1 + 0.5 * boost) * x3_velocity;
+            y3 += rand_y * (1 + 0.5 * boost) * y3_velocity;
+        }
+        else if (number_of_enemies > 3 && number_of_enemies < 5)
+        {
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x4 += rand_x * (1 + 0.5 * boost) * x4_velocity;
+            y4 += rand_y * (1 + 0.5 * boost) * y4_velocity;
+        }
+        else if (number_of_enemies > 4)
+        {
+            rand_x = sizer*3/4 + r.nextInt(width - sizer*5/4);
+            rand_y = sizer*3/4 + r.nextInt(height - sizer*5/4);
+            x5 += rand_x * (1 + 0.5 * boost) * x5_velocity;
+            y5 += rand_y * (1 + 0.5 * boost) * y5_velocity;
+        }
+
+        repaint();
     }
 
 
@@ -390,7 +502,6 @@ public class Game extends JPanel implements ActionListener
     {
         state = given_state;
     }
-
 
     public double getPoints()
     {
@@ -427,17 +538,34 @@ public class Game extends JPanel implements ActionListener
         this.setDoubleBuffered(true);
         g.drawImage(background_image, 0, 0, width, height, this);
 
-        Graphics2D g2d = (Graphics2D) g;
-
         loadImage();
-        //g.drawImage(enemy_image,(int)x,(int)y,sizer,sizer,this);
+        g.drawImage(enemy_image, x1, y1,sizer,sizer,this);
+        rect1 = new Rectangle2D.Double(x1, y1, sizer, sizer);
 
-        for (int i = 0; i < number_of_enemies; i++)
+        if (number_of_enemies > 1 && number_of_enemies < 3)
         {
-            g.drawImage(enemy_image,x_list.get(i),y_list.get(i),sizer,sizer,this);
-            rect_list.add(new Rectangle2D.Double(x_list.get(i), y_list.get(i), sizer, sizer));
+            loadImage();
+            g.drawImage(enemy_image, x2, y2,sizer,sizer,this);
+            rect2 = new Rectangle2D.Double(x2, y2, sizer, sizer);
         }
-//        rect = new Rectangle2D.Double((int)x, (int)y, sizer, sizer);
+        else if (number_of_enemies > 2 && number_of_enemies < 4)
+        {
+            loadImage();
+            g.drawImage(enemy_image, x3, y3,sizer,sizer,this);
+            rect3 = new Rectangle2D.Double(x3, y3, sizer, sizer);
+        }
+        else if (number_of_enemies > 3 && number_of_enemies < 5)
+        {
+            loadImage();
+            g.drawImage(enemy_image, x4, y4,sizer,sizer,this);
+            rect4 = new Rectangle2D.Double(x4, y4, sizer, sizer);
+        }
+        else if (number_of_enemies > 4)
+        {
+            loadImage();
+            g.drawImage(enemy_image, x5, y5,sizer,sizer,this);
+            rect5 = new Rectangle2D.Double(x5, y5, sizer, sizer);
+        }
 
         t.start();
     }

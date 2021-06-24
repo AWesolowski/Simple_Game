@@ -65,7 +65,7 @@ public class Ending  extends JPanel
         this.add(nickname);
         setComponentZOrder(nickname, 0);
 
-        nickname2 = new JLabel("Your score : " + points, SwingConstants.CENTER);
+        nickname2 = new JLabel("Your score : " + String.format("%.2f", points), SwingConstants.CENTER);
         nickname2.setForeground(Color.lightGray);
         this.add(nickname2);
         setComponentZOrder(nickname2, 0);

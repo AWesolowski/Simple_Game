@@ -32,10 +32,10 @@ public class Offline_Parser {
             // get the property value and print it out
             speed_boost=Integer.parseInt(prop.getProperty("speed_boost"));
             collisions_available=Integer.parseInt(prop.getProperty("collisions_available"));
-            speed_parameter=Integer.parseInt(prop.getProperty("speed_parameter"));
+            speed_parameter=Double.parseDouble(prop.getProperty("speed_parameter"));
             number_of_levels=Integer.parseInt(prop.getProperty("number_of_levels"));
-            difficulty_change=Float.parseFloat(prop.getProperty("difficulty_change"));
-            starting_object_size=Float.parseFloat(prop.getProperty("starting_object_size"));
+            difficulty_change=Double.parseDouble(prop.getProperty("difficulty_change"));
+            starting_object_size=Double.parseDouble(prop.getProperty("starting_object_size"));
             number_of_enemies = Integer.parseInt(prop.getProperty("number_of_enemies"));
         } catch (IOException ex) {
             ex.printStackTrace();

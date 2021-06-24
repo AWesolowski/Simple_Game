@@ -3,5 +3,5 @@ collisions_available=10
 speed_parameter=0.1f
 number_of_levels=5
 difficulty_change=20
-starting_object_size=4
-number_of_enemies=3
+starting_object_size=6
+number_of_enemies=1

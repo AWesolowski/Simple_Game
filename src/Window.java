@@ -63,7 +63,7 @@ public class Window extends JFrame
         connection_status_label.setForeground(Color.red);
 
         client = new Client();
-        connection_status = client.otworzPolaczenie("Adam", 8080);
+        connection_status = client.otworzPolaczenie("127.0.0.1", 8080);
 
         if (connection_status)
         {
